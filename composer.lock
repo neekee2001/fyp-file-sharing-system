@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa322c53454393ed775cfe4807d54a50",
+    "content-hash": "9347a17fadc542501409b92dbe8d7c35",
     "packages": [
         {
             "name": "brick/math",
@@ -3104,6 +3104,61 @@
                 }
             ],
             "time": "2023-04-15T23:01:58+00:00"
+        },
+        {
+            "name": "rannmann/php-ipfs-api",
+            "version": "0.0.11",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rannmann/php-ipfs-api.git",
+                "reference": "b1eb65c5e06bd8a10df0ac0e04b6f55a2ae71ccf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rannmann/php-ipfs-api/zipball/b1eb65c5e06bd8a10df0ac0e04b6f55a2ae71ccf",
+                "reference": "b1eb65c5e06bd8a10df0ac0e04b6f55a2ae71ccf",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "rannmann\\PhpIpfsApi\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vincent Cloutier",
+                    "email": "vincent@cloutier.co",
+                    "homepage": "http://vincent.cloutier.co",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Jake Forrester",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A client library for the IPFS API",
+            "homepage": "https://github.com/rannmann/php-ipfs-api",
+            "keywords": [
+                "ipfs"
+            ],
+            "support": {
+                "issues": "https://github.com/rannmann/php-ipfs-api/issues",
+                "source": "https://github.com/rannmann/php-ipfs-api/tree/master"
+            },
+            "time": "2020-01-09T21:13:03+00:00"
         },
         {
             "name": "symfony/console",

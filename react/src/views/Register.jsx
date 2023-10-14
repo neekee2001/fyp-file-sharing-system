@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider.jsx";
-import axiosClient from "../axios-client.js";
-import Logo from "../images/logo.png";
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider.jsx';
+import axiosClient from '../axios-client.js';
+import Logo from '../images/logo.png';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -74,7 +74,7 @@ export default function Register() {
     return (
         <Paper elevation={4} style={paperStyle}>
             <Grid align="center">
-                <Box component="img" sx={{ m: 1, height: 1/4, width: 1/4, }} src={Logo} />
+                <Box component="img" sx={{ m: 1, height: '20%', width: '20%', }} src={Logo} />
                 <Typography variant="h5" gutterBottom>
                     Register
                 </Typography>

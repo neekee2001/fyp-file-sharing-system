@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState } from 'react';
 
 const StateContext = createContext({
     user: null,
@@ -29,7 +29,7 @@ export const ContextProvider = ({children}) => {
 
         setTimeout(() => {
             _setNotification('')
-        }, 4000)
+        }, 6000)
     }
 
     return (

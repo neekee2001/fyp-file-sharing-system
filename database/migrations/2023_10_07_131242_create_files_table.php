@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('files', function (Blueprint $table) {
             $table->id();
             $table->string('file_name');
-            $table->string('file_type')->nullable();
             $table->integer('file_size')->nullable();
             $table->string('ipfs_cid')->notNull();
             $table->foreignId('uploaded_by_user_id')->constrained('users');

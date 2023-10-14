@@ -1,12 +1,12 @@
-import {Navigate, createBrowserRouter} from "react-router-dom";
-import Login from "./views/Login.jsx";
-import Register from "./views/Register.jsx";
-import NotFound from "./views/NotFound.jsx";
-import MyFiles from "./views/MyFiles.jsx";
-import SharedWithMe from "./views/SharedWithMe.jsx";
-import Profile from "./views/Profile.jsx";
-import DefaultLayout from "./components/DefaultLayout.jsx";
-import GuestLayout from "./components/GuestLayout.jsx";
+import {Navigate, createBrowserRouter} from 'react-router-dom';
+import Login from './views/Login.jsx';
+import Register from './views/Register.jsx';
+import NotFound from './views/NotFound.jsx';
+import MyFiles from './views/MyFiles.jsx';
+import SharedWithMe from './views/SharedWithMe.jsx';
+import Profile from './views/Profile.jsx';
+import DefaultLayout from './components/DefaultLayout.jsx';
+import GuestLayout from './components/GuestLayout.jsx';
 
 const router = createBrowserRouter([
     {

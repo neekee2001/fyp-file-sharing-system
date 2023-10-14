@@ -1,8 +1,9 @@
-import { Link, Navigate, Outlet } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider.jsx";
-import { useState } from "react";
-import axiosClient from "../axios-client.js";
-import Logo from "../images/logo.png";
+import { Link, Navigate, Outlet } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider.jsx';
+import { useState } from 'react';
+import axiosClient from '../axios-client.js';
+import Logo from '../images/logo.png';
+import Alert from '@mui/material/Alert';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -12,11 +13,13 @@ import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import Snackbar from '@mui/material/Snackbar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
 export default function DefaultLayout() {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const [open, setOpen] = useState(true);
     const {token, setUser, setToken, notification} = useStateContext();
 
     if (!token) {
@@ -25,6 +28,14 @@ export default function DefaultLayout() {
 
     const handleListItemClick = (ev, index) => {
         setSelectedIndex(index);
+    }
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+    
+        setOpen(false);
     }
 
     const onLogOut = (ev) => {
@@ -40,7 +51,7 @@ export default function DefaultLayout() {
         <Grid sx={{ display: 'flex' }}>
             <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}> 
                 <Toolbar>
-                    <Box component="img" sx={{ mr: 1.5, height: 1/40, width: 1/40, }} src={Logo} />
+                    <Box component="img" sx={{ mr: 1.5, height: '2.5%', width: '2.5%', }} src={Logo} />
                     <Typography variant="button" noWrap component="div" sx={{ flexGrow: 1 }}>
                         Jabatan Kemajuan Islam Malaysia (JAKIM)
                     </Typography>
@@ -66,16 +77,16 @@ export default function DefaultLayout() {
                     </List>
                 </Grid>
             </Drawer>
-            <Grid component="main" sx={{ flexGrow: 1, p: 3, }}>
+            <Grid component="main" sx={{ flexGrow: 1, p: 2, }}>
                 <Toolbar />
                 <Outlet />
             </Grid>
+            {notification && <Snackbar open={open} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={6000} onClose={handleClose}>
+                <Alert severity="success" onClose={handleClose}>
+                    {notification}
+                </Alert>
+            </Snackbar>
+            }
         </Grid>
-
-        // TODO: set notification message            
-        //         {notification && <div className="notification">
-        //             {notification}
-        //         </div>
-        //         }
     )
 }

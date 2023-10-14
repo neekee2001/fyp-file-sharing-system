@@ -1,5 +1,5 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { useStateContext } from "../contexts/ContextProvider";
+import { Navigate, Outlet } from 'react-router-dom';
+import { useStateContext } from '../contexts/ContextProvider';
 import Grid from '@mui/material/Grid';
 
 export default function GuestLayout() {

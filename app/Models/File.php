@@ -23,9 +23,13 @@ class File extends Model
 
     protected $fillable = [
         'file_name',
-        'file_type',
         'file_size',
         'ipfs_cid',
         'uploaded_by_user_id',
+    ];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+        'updated_at' => 'datetime:Y-m-d',
     ];
 }

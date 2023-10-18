@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DownloadFileRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Models\File;
 use Illuminate\Http\Request;
@@ -31,6 +32,7 @@ class FileController extends Controller
             $file = $request->file('file');
             $fileName = $file->getClientOriginalName();
             $fileSize = $file->getSize();
+            $fileMime = $file->getMimeType();
             $filePath = $file->getRealPath();
             $fileHash = ipfs()->addFromPath($filePath);
             $userId = Auth::id();
@@ -38,6 +40,7 @@ class FileController extends Controller
             File::create([
                 'file_name' => $fileName,
                 'file_size' => $fileSize,
+                'file_mime' => $fileMime,
                 'ipfs_cid' => $fileHash,
                 'uploaded_by_user_id' => $userId,
             ]);
@@ -61,9 +64,28 @@ class FileController extends Controller
     }
 
     // Download file uploaded by user
-    public function downloadFromMyFiles(Request $request)
+    public function downloadFromMyFiles(DownloadFileRequest $request)
     {
-        //
+        $data = $request->validated();
+        $fileId = $data['file_id'];
+        $fileRecord = File::where('id', $fileId)->first();
+
+        $fileName = $fileRecord->file_name;
+        $fileMime = $fileRecord->file_mime;
+        $hash = $fileRecord->ipfs_cid;
+        $file = ipfs()->get($hash);
+
+        // if ($file === false) {
+        //     return response()->json([
+        //         'error' => 'File not found on IPFS'
+        //     ], 404);
+        // }
+    
+        return response($file)
+            ->withHeaders([
+                'Content-Type' => $fileMime,
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+            ]);
     }
 
     // Download file shared to user

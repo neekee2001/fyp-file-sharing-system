@@ -24,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function() {
     });
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::post('/file/upload', [FileController::class, 'store']);
+    Route::post('/file/download-myfiles', [FileController::class, 'downloadFromMyFiles']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

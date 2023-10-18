@@ -6,6 +6,8 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -31,13 +33,26 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function MyFiles() {
     const fileUploadRef = useRef();
+
     const [errors, setErrors] = useState(null);
     const [files, setFiles] = useState([]);
+    const [selectedFileId, setSelectedFileId] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
     const {setNotification} = useStateContext();
 
     useEffect(() => {
         getFiles();
     }, [])
+
+    const handleMoreIconOpen = (ev, id) => {
+        setAnchorEl(ev.currentTarget);
+        setSelectedFileId(id);
+    }
+
+    const handleMoreIconClose = () => {
+        setAnchorEl(null);
+        setSelectedFileId(0);
+    }
 
     const getFiles = () => {
         axiosClient.get('/myfiles')
@@ -78,6 +93,47 @@ export default function MyFiles() {
 
         fileUploadRef.current.value = null;
     }
+
+    const handleFileDownload = () => {
+        const payload = {
+            file_id: selectedFileId,
+        }
+
+        axiosClient.post('/file/download-myfiles', payload, {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                const href = window.URL.createObjectURL(response.data);
+                const anchorElement = document.createElement('a');
+                anchorElement.href = href;
+                const contentDisposition = response.headers['content-disposition'];
+                
+                let fileName = "";
+
+                if (contentDisposition) {
+                    const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+
+                    if (fileNameMatch.length === 2) {
+                        fileName = fileNameMatch[1];
+                    }
+                }
+
+                anchorElement.download = fileName;
+                document.body.appendChild(anchorElement);
+                anchorElement.click();
+                document.body.removeChild(anchorElement);
+                window.URL.revokeObjectURL(href);
+            })
+            .catch((err) => {
+                const response = err.response;
+                if (response && response.status == 422) {
+                    setErrors(response.data.message)
+                    setTimeout(() => {
+                        setErrors('')
+                    }, 6000)
+                }
+            })
+    }
     
     return (
         <Grid>
@@ -94,7 +150,7 @@ export default function MyFiles() {
                 {errors}
             </Alert>
             }
-            <Paper elevation={4} sx={{ my: 2, }}>
+            <Paper elevation={4} sx={{ my: 2, height: 450, }}>
                 <TableContainer sx={{ maxHeight: 450, }}>
                     <Table stickyHeader>
                         <TableHead>
@@ -110,12 +166,23 @@ export default function MyFiles() {
                                     <TableCell>{file.file_name}</TableCell>
                                     <TableCell>{file.updated_at}</TableCell>
                                     <TableCell>
-                                        <IconButton aria-label="menu" size="small">
+                                        <IconButton aria-label="more" aria-controls="menu-list" aria-haspopup="true" onClick={(ev) => handleMoreIconOpen(ev, file.id)} size="small">
                                             <MoreVertIcon fontSize="inherit" />
                                         </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
+                            <Menu 
+                                id="menu-list"
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMoreIconClose}
+                                >
+                                <MenuItem>Share</MenuItem>
+                                <MenuItem>Rename</MenuItem>
+                                <MenuItem onClick={handleFileDownload}>Download</MenuItem>
+                                <MenuItem>Delete</MenuItem>
+                            </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>

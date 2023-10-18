@@ -30,7 +30,7 @@ export default function DefaultLayout() {
         setSelectedIndex(index);
     }
 
-    const handleClose = (event, reason) => {
+    const handleNotificationClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
@@ -81,8 +81,8 @@ export default function DefaultLayout() {
                 <Toolbar />
                 <Outlet />
             </Grid>
-            {notification && <Snackbar open={open} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={6000} onClose={handleClose}>
-                <Alert severity="success" onClose={handleClose}>
+            {notification && <Snackbar open={open} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }} autoHideDuration={6000} onClose={handleNotificationClose}>
+                <Alert severity="success" onClose={handleNotificationClose}>
                     {notification}
                 </Alert>
             </Snackbar>

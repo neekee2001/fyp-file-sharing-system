@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('file_name');
             $table->integer('file_size')->nullable();
+            $table->string('file_mime')->nullable();
             $table->string('ipfs_cid')->notNull();
             $table->foreignId('uploaded_by_user_id')->constrained('users');
             $table->unique(['file_name', 'uploaded_by_user_id']);

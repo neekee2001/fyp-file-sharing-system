@@ -24,6 +24,7 @@ class File extends Model
     protected $fillable = [
         'file_name',
         'file_size',
+        'file_mime',
         'ipfs_cid',
         'uploaded_by_user_id',
     ];

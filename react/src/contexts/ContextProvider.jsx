@@ -15,7 +15,7 @@ export const ContextProvider = ({children}) => {
     const [notification, _setNotification] = useState('');
 
     const setToken = (token) => {
-        _setToken(token)
+        _setToken(token);
         if (token) {
             localStorage.setItem('ACCESS_TOKEN', token);
         }
@@ -28,8 +28,8 @@ export const ContextProvider = ({children}) => {
         _setNotification(message);
 
         setTimeout(() => {
-            _setNotification('')
-        }, 6000)
+            _setNotification('');
+        }, 6000);
     }
 
     return (

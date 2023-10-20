@@ -44,7 +44,7 @@ export default function Register() {
     }, [])
 
     const onSubmit = (ev) => {
-        ev.preventDefault()
+        ev.preventDefault();
         
         const payload = {
             name: nameRef.current.value,
@@ -57,13 +57,13 @@ export default function Register() {
         
         axiosClient.post('/register', payload)
             .then(({data}) => {
-                setUser(data.user)
-                setToken(data.token)
+                setUser(data.user);
+                setToken(data.token);
             })
             .catch((err) => {
                 const response = err.response;
                 if (response && response.status == 422) {
-                    setErrors(response.data.errors)
+                    setErrors(response.data.errors);
                 }
             })
     }

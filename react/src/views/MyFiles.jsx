@@ -77,17 +77,17 @@ export default function MyFiles() {
         })
             .then((response) => {
                 if (response && response.status == 201) {
-                    setNotification(response.data.message)
-                    getFiles()
+                    setNotification(response.data.message);
+                    getFiles();
                 }
             })
             .catch((err) => {
                 const response = err.response;
                 if (response && response.status == 422) {
-                    setErrors(response.data.message)
+                    setErrors(response.data.message);
                     setTimeout(() => {
-                        setErrors('')
-                    }, 6000)
+                        setErrors('');
+                    }, 6000);
                 }
             })
 
@@ -95,14 +95,13 @@ export default function MyFiles() {
     }
 
     const handleFileDownload = () => {
-        const payload = {
-            file_id: selectedFileId,
-        }
-
-        axiosClient.post('/file/download-myfiles', payload, {
+        const fileId = selectedFileId;
+        
+        axiosClient.get('/file/download-myfiles/' + fileId, {
             responseType: 'blob',
         })
             .then((response) => {
+                handleMoreIconClose();
                 const href = window.URL.createObjectURL(response.data);
                 const anchorElement = document.createElement('a');
                 anchorElement.href = href;
@@ -126,15 +125,37 @@ export default function MyFiles() {
             })
             .catch((err) => {
                 const response = err.response;
-                if (response && response.status == 422) {
-                    setErrors(response.data.message)
+                if (response && response.status == 404) {
+                    setErrors(response.data.message);
                     setTimeout(() => {
-                        setErrors('')
-                    }, 6000)
+                        setErrors('');
+                    }, 6000);
                 }
             })
     }
     
+    const handleFileDelete = () => {
+        const fileId = selectedFileId;
+
+        axiosClient.delete('/file/delete/' + fileId)
+            .then((response) => {
+                if (response && response.status == 200) {
+                    handleMoreIconClose();
+                    setNotification(response.data.message);
+                    getFiles();
+                }
+            })
+            .catch((err) => {
+                const response = err.response;
+                if (response && response.status == 404) {
+                    setErrors(response.data.message);
+                    setTimeout(() => {
+                        setErrors('');
+                    }, 6000);
+                }
+            })
+    }
+
     return (
         <Grid>
             <Grid sx={{ mb: 3, display: 'flex', }}>
@@ -181,7 +202,7 @@ export default function MyFiles() {
                                 <MenuItem>Share</MenuItem>
                                 <MenuItem>Rename</MenuItem>
                                 <MenuItem onClick={handleFileDownload}>Download</MenuItem>
-                                <MenuItem>Delete</MenuItem>
+                                <MenuItem onClick={handleFileDelete}>Delete</MenuItem>
                             </Menu>
                         </TableBody>
                     </Table>

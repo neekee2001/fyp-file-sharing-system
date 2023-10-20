@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\DownloadFileRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Models\File;
 use Illuminate\Http\Request;
@@ -64,11 +63,16 @@ class FileController extends Controller
     }
 
     // Download file uploaded by user
-    public function downloadFromMyFiles(DownloadFileRequest $request)
+    public function downloadFromMyFiles($id)
     {
-        $data = $request->validated();
-        $fileId = $data['file_id'];
-        $fileRecord = File::where('id', $fileId)->first();
+        $userId = Auth::id();
+        $fileRecord = File::where('id', $id)->where('uploaded_by_user_id', $userId)->first();
+
+        if (!$fileRecord) {
+            return response()->json([
+                'message' => 'File not found'
+            ], 404);
+        }
 
         $fileName = $fileRecord->file_name;
         $fileMime = $fileRecord->file_mime;
@@ -107,8 +111,21 @@ class FileController extends Controller
     }
 
     // Delete file
-    public function destroy(File $file)
+    public function destroy($id)
     {
-        //
+        $userId = Auth::id();
+        $file = File::where('id', $id)->where('uploaded_by_user_id', $userId)->first();
+
+        if (!$file) {
+            return response()->json([
+                'message' => 'File not found'
+            ], 404);
+        }
+
+        $file->delete();
+
+        return response()->json([
+            'message' => 'File deleted successfully'
+        ], 200);
     }
 }

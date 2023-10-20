@@ -19,7 +19,7 @@ export default function Login() {
     const {setUser, setToken} = useStateContext();
 
     const onSubmit = (ev) => {
-        ev.preventDefault()
+        ev.preventDefault();
         
         const payload = {
             email: emailRef.current.value,
@@ -28,19 +28,19 @@ export default function Login() {
         
         axiosClient.post('/login', payload)
             .then(({data}) => {
-                setUser(data.user)
-                setToken(data.token)
+                setUser(data.user);
+                setToken(data.token);
             })
             .catch((err) => {
                 const response = err.response;
                 if (response && response.status == 422) {
                     if (response.data.errors) {
-                        setErrors(response.data.errors)
+                        setErrors(response.data.errors);
                     }
                     else {
                         setErrors({
                             email: [response.data.message]
-                        })
+                        });
                     }
                 }
             })

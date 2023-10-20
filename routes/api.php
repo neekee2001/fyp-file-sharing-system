@@ -24,7 +24,8 @@ Route::middleware('auth:sanctum')->group(function() {
     });
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::post('/file/upload', [FileController::class, 'store']);
-    Route::post('/file/download-myfiles', [FileController::class, 'downloadFromMyFiles']);
+    Route::get('/file/download-myfiles/{id}', [FileController::class, 'downloadFromMyFiles']);
+    Route::delete('/file/delete/{id}', [FileController::class, 'destroy']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

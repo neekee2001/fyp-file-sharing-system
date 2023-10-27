@@ -14,14 +14,14 @@ class DepartmentSeeder extends Seeder
     public function run(): void
     {
         DB::table('departments')->insert([
-            ['name' => 'Pejabat Ketua Pengarah'],
-            ['name' => 'Bahagian Undang-Undang'],
-            ['name' => 'Bahagian Penyelidikan'],
-            ['name' => 'Bahagian Penerbitan'],
-            ['name' => 'Bahagian Penyiaran'],
-            ['name' => 'Bahagian Pengurusan Sumber Manusia'],
-            ['name' => 'Bahagian Kewangan'],
-            ['name' => 'Bahagian Pengurusan Maklumat'],
+            ['dep_name' => 'Pejabat Ketua Pengarah'],
+            ['dep_name' => 'Bahagian Undang-Undang'],
+            ['dep_name' => 'Bahagian Penyelidikan'],
+            ['dep_name' => 'Bahagian Penerbitan'],
+            ['dep_name' => 'Bahagian Penyiaran'],
+            ['dep_name' => 'Bahagian Pengurusan Sumber Manusia'],
+            ['dep_name' => 'Bahagian Kewangan'],
+            ['dep_name' => 'Bahagian Pengurusan Maklumat'],
             // Add more departments as needed
         ]);
     }

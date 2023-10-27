@@ -91,14 +91,14 @@ export default function Register() {
                 <TextField id="dep_id" select label="Department" defaultValue="" inputRef={depIdRef} variant="filled" margin="dense" fullWidth required>
                     {departmentOptions.map((dep) => (
                         <MenuItem key={dep.id} value={dep.id}>
-                            {dep.name}
+                            {dep.dep_name}
                         </MenuItem>
                     ))}
                 </TextField>
                 <TextField id="role_id" select label="Role" defaultValue="" inputRef={roleIdRef} variant="filled" margin="dense" fullWidth required>
                     {roleOptions.map((role) => (
                         <MenuItem key={role.id} value={role.id}>
-                            {role.name}
+                            {role.role_name}
                         </MenuItem>
                     ))}
                 </TextField>

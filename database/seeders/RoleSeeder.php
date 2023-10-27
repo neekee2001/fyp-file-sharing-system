@@ -14,13 +14,13 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         DB::table('roles')->insert([
-            ['name' => 'Ketua Pengarah'],
-            ['name' => 'Timbalan Ketua Pengarah'],
-            ['name' => 'Pengarah Kanan'],
-            ['name' => 'Penolong Pengarah Kanan'],
-            ['name' => 'Penolong Pegawai'],
-            ['name' => 'Pembantu Tadbir'],
-            ['name' => 'Setiausaha Pejabat'],
+            ['role_name' => 'Ketua Pengarah'],
+            ['role_name' => 'Timbalan Ketua Pengarah'],
+            ['role_name' => 'Pengarah Kanan'],
+            ['role_name' => 'Penolong Pengarah Kanan'],
+            ['role_name' => 'Penolong Pegawai'],
+            ['role_name' => 'Pembantu Tadbir'],
+            ['role_name' => 'Setiausaha Pejabat'],
             // Add more roles as needed
         ]);
     }

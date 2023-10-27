@@ -14,10 +14,10 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         DB::table('permissions')->insert([
-            ['name' => 'Viewer',
-             'description' => 'Able to download the file'],
-            ['name' => 'Editor',
-             'description' => 'Able to download and rename the file'],
+            ['permission_name' => 'Viewer',
+             'permission_description' => 'Able to download the file'],
+            ['permission_name' => 'Editor',
+             'permission_description' => 'Able to download and rename the file'],
             // Add more permissions as needed
         ]);
     }

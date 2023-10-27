@@ -1,8 +1,142 @@
+import { useEffect, useState } from 'react';
+import axiosClient from '../axios-client.js';
+import { useStateContext } from '../contexts/ContextProvider.jsx';
+import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+
 export default function SharedWithMe() {
+    const [errors, setErrors] = useState(null);
+    const [files, setFiles] = useState([]);
+    const [selectedFileId, setSelectedFileId] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [showEdit, setShowEdit] = useState(false);
+    const {setNotification} = useStateContext();
+
+    useEffect(() => {
+        getSharedFiles();
+    }, [])
+
+    const handleMoreIconOpen = (ev, id, permission) => {
+        setAnchorEl(ev.currentTarget);
+        setSelectedFileId(id);
+        setShowEdit(permission === 'Editor');
+    }
+
+    const handleMoreIconClose = () => {
+        setAnchorEl(null);
+        setSelectedFileId(0);
+    }
+
+    const getSharedFiles = () => {
+        axiosClient.get('/shared-with-me')
+            .then(({data}) => {
+                setFiles(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching file data:', err);
+            })
+    }
+
+    const handleFileDownload = () => {
+        const fileId = selectedFileId;
+        
+        axiosClient.get('/file/download-shared-with-me/' + fileId, {
+            responseType: 'blob',
+        })
+            .then((response) => {
+                handleMoreIconClose();
+                const href = window.URL.createObjectURL(response.data);
+                const anchorElement = document.createElement('a');
+                anchorElement.href = href;
+                const contentDisposition = response.headers['content-disposition'];
+                
+                let fileName = "";
+
+                if (contentDisposition) {
+                    const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+
+                    if (fileNameMatch.length === 2) {
+                        fileName = fileNameMatch[1];
+                    }
+                }
+
+                anchorElement.download = fileName;
+                document.body.appendChild(anchorElement);
+                anchorElement.click();
+                document.body.removeChild(anchorElement);
+                window.URL.revokeObjectURL(href);
+            })
+            .catch((err) => {
+                const response = err.response;
+                if (response && response.status == 404) {
+                    setErrors(response.data.message);
+                    setTimeout(() => {
+                        setErrors('');
+                    }, 6000);
+                }
+            })
+    }
     
     return (
-        <div>
-            Shared With Me
-        </div>
+        <Grid>
+            <Grid sx={{ mb: 3, display: 'flex', }}>
+                <Typography variant="h6" component="div" sx={{ py: 0.5, flexGrow: 1, }}>
+                    Shared With Me
+                </Typography>
+            </Grid>
+            {errors && <Alert severity="error" sx={{ alignItems: 'center', }}>
+                {errors}
+            </Alert>
+            }
+            <Paper elevation={4} sx={{ my: 2, height: 450, }}>
+                <TableContainer sx={{ maxHeight: 450, }}>
+                    <Table stickyHeader>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ width: '50%', }}>Name</TableCell>
+                                <TableCell sx={{ width: '30%', }}>Owner</TableCell>
+                                <TableCell sx={{ width: '15%', }}>Shared Date</TableCell>
+                                <TableCell sx={{ width: '5%', }}></TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {files.map((file) => (
+                                <TableRow key={file.file_id}>
+                                    <TableCell>{file.file_name}</TableCell>
+                                    <TableCell>{file.name}</TableCell>
+                                    <TableCell>{file.created_at}</TableCell>
+                                    <TableCell>
+                                        <IconButton aria-label="more" aria-controls="menu-list" aria-haspopup="true" onClick={(ev) => handleMoreIconOpen(ev, file.file_id, file.permission_name)} size="small">
+                                            <MoreVertIcon fontSize="inherit" />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                            <Menu 
+                                id="menu-list"
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMoreIconClose}
+                                >
+                                {showEdit && <MenuItem>Edit</MenuItem>}
+                                <MenuItem onClick={handleFileDownload}>Download</MenuItem>
+                            </Menu>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </Grid>
     )
 }

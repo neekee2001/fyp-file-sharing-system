@@ -4,6 +4,10 @@ import { useStateContext } from '../contexts/ContextProvider.jsx';
 import { styled } from '@mui/material/styles';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -15,6 +19,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -33,11 +38,17 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function MyFiles() {
     const fileUploadRef = useRef();
+    const permissionIdRef = useRef();
+    const userIdRef = useRef();
 
     const [errors, setErrors] = useState(null);
     const [files, setFiles] = useState([]);
     const [selectedFileId, setSelectedFileId] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogErrors, setDialogErrors] = useState(null);
+    const [userOptions, setUserOptions] = useState([]);
+    const [permissionOptions, setPermissionOptions] = useState([]);
     const {setNotification} = useStateContext();
 
     useEffect(() => {
@@ -54,6 +65,17 @@ export default function MyFiles() {
         setSelectedFileId(0);
     }
 
+    const handleShareDialogOpen = () => {
+        getUsers();
+        getSharePermissions();
+        setDialogOpen(true);
+    }
+
+    const handleShareDialogClose = () => {
+        handleMoreIconClose();
+        setDialogOpen(false);
+    }
+
     const getFiles = () => {
         axiosClient.get('/myfiles')
             .then(({data}) => {
@@ -61,6 +83,26 @@ export default function MyFiles() {
             })
             .catch((err) => {
                 console.error('Error fetching file data:', err);
+            })
+    }
+
+    const getUsers = () => {
+        axiosClient.get('/users-to-share')
+            .then(({data}) => {
+                setUserOptions(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching user data:', err);
+            })
+    }
+
+    const getSharePermissions = () => {
+        axiosClient.get('/permissions')
+            .then(({data}) => {
+                setPermissionOptions(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching permission data:', err);
             })
     }
 
@@ -92,6 +134,32 @@ export default function MyFiles() {
             })
 
         fileUploadRef.current.value = null;
+    }
+
+    const handleFileShare = () => {
+        const payload = {
+            file_id: selectedFileId,
+            shared_with_user_id: userIdRef.current.value,
+            permission_id: permissionIdRef.current.value,
+        }
+
+        axiosClient.post('/file/share', payload)
+            .then((response) => {
+                if (response && response.status == 201) {
+                    handleShareDialogClose();
+                    handleMoreIconClose();
+                    setNotification(response.data.message);
+                }
+            })
+            .catch((err) => {
+                const response = err.response;
+                if (response && (response.status == 404 || response.status == 422)) {
+                    setDialogErrors(response.data.message);
+                    setTimeout(() => {
+                        setDialogErrors('');
+                    }, 6000);
+                }
+            })
     }
 
     const handleFileDownload = () => {
@@ -199,8 +267,8 @@ export default function MyFiles() {
                                 open={Boolean(anchorEl)}
                                 onClose={handleMoreIconClose}
                                 >
-                                <MenuItem>Share</MenuItem>
-                                <MenuItem>Rename</MenuItem>
+                                <MenuItem onClick={handleShareDialogOpen}>Share</MenuItem>
+                                <MenuItem>Edit</MenuItem>
                                 <MenuItem onClick={handleFileDownload}>Download</MenuItem>
                                 <MenuItem onClick={handleFileDelete}>Delete</MenuItem>
                             </Menu>
@@ -208,6 +276,35 @@ export default function MyFiles() {
                     </Table>
                 </TableContainer>
             </Paper>
+            <Dialog open={dialogOpen} onClose={handleShareDialogClose} fullWidth maxWidth="sm">
+                <DialogTitle>
+                    Share
+                </DialogTitle>
+                <DialogContent dividers>
+                    {dialogErrors && <Alert severity="error" sx={{ alignItems: 'center', }}>
+                        {dialogErrors}
+                    </Alert>
+                    }
+                    <TextField id="user_id" select label="Add user" defaultValue="" inputRef={userIdRef} variant="filled" margin="dense" fullWidth required>
+                        {userOptions.map((user) => (
+                            <MenuItem key={user.id} value={user.id}>
+                                {user.email}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <TextField id="permission_id" select label="Permission" defaultValue="" inputRef={permissionIdRef} variant="filled" margin="dense" fullWidth required>
+                        {permissionOptions.map((permission) => (
+                            <MenuItem key={permission.id} value={permission.id}>
+                                {permission.permission_name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleShareDialogClose}>Cancel</Button>
+                    <Button onClick={handleFileShare}>Share</Button>
+                </DialogActions>
+            </Dialog>
         </Grid>
     )
 }

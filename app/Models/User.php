@@ -30,6 +30,11 @@ class User extends Authenticatable
         return $this->hasMany(File::class);
     }
 
+    public function shareRequests(): HasMany
+    {
+        return $this->hasMany(ShareRequest::class);
+    }
+
     public function sharedFiles(): HasMany
     {
         return $this->hasMany(SharedFile::class);

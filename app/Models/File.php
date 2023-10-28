@@ -16,6 +16,11 @@ class File extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function shareRequests(): HasMany
+    {
+        return $this->hasMany(ShareRequest::class);
+    }
+
     public function sharedFiles(): HasMany
     {
         return $this->hasMany(SharedFile::class);
@@ -23,6 +28,7 @@ class File extends Model
 
     protected $fillable = [
         'file_name',
+        'file_description',
         'file_size',
         'file_mime',
         'ipfs_cid',

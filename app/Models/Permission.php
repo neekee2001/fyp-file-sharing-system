@@ -10,6 +10,11 @@ class Permission extends Model
 {
     use HasFactory;
 
+    public function shareRequests(): HasMany
+    {
+        return $this->hasMany(ShareRequest::class);
+    }
+
     public function sharedFiles(): HasMany
     {
         return $this->hasMany(SharedFile::class);

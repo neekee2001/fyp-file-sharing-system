@@ -31,6 +31,7 @@ class StoreFileRequest extends FormRequest
                 'max:10240', 
                 new FileNameRule()
             ],
+            'file_description' => 'required|string|max:200'
         ];
     }
 

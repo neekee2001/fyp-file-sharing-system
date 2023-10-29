@@ -51,8 +51,11 @@ class FileController extends Controller
     public function store(StoreFileRequest $request)
     {
         if ($request->hasFile('file')) {
+            $data = $request->validated();
             $file = $request->file('file');
+
             $fileName = $file->getClientOriginalName();
+            $fileDescription = $data['file_description'];
             $fileSize = $file->getSize();
             $fileMime = $file->getMimeType();
             $filePath = $file->getRealPath();
@@ -61,6 +64,7 @@ class FileController extends Controller
 
             File::create([
                 'file_name' => $fileName,
+                'file_description' => $fileDescription,
                 'file_size' => $fileSize,
                 'file_mime' => $fileMime,
                 'ipfs_cid' => $fileHash,

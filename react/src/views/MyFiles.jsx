@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import axiosClient from '../axios-client.js';
 import { useStateContext } from '../contexts/ContextProvider.jsx';
-import { styled } from '@mui/material/styles';
+import FileUploadDialog from '../components/FileUploadDialog.jsx';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -24,20 +24,7 @@ import Typography from '@mui/material/Typography';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
-
 export default function MyFiles() {
-    const fileUploadRef = useRef();
     const permissionIdRef = useRef();
     const userIdRef = useRef();
 
@@ -45,6 +32,7 @@ export default function MyFiles() {
     const [files, setFiles] = useState([]);
     const [selectedFileId, setSelectedFileId] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogErrors, setDialogErrors] = useState(null);
     const [userOptions, setUserOptions] = useState([]);
@@ -63,6 +51,15 @@ export default function MyFiles() {
     const handleMoreIconClose = () => {
         setAnchorEl(null);
         setSelectedFileId(0);
+    }
+
+    const handleUploadDialogOpen = () => {
+        setUploadDialogOpen(true);
+    }
+
+    const handleUploadDialogClose = () => {
+        setUploadDialogOpen(false);
+        getFiles();
     }
 
     const handleShareDialogOpen = () => {
@@ -104,36 +101,6 @@ export default function MyFiles() {
             .catch((err) => {
                 console.error('Error fetching permission data:', err);
             })
-    }
-
-    const handleFileUpload = (ev) => {
-        const fileObj = ev.target.files[0];
-
-        const formData = new FormData();
-        formData.append('file', fileObj);
-
-        axiosClient.post('/file/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
-            .then((response) => {
-                if (response && response.status == 201) {
-                    setNotification(response.data.message);
-                    getFiles();
-                }
-            })
-            .catch((err) => {
-                const response = err.response;
-                if (response && response.status == 422) {
-                    setErrors(response.data.message);
-                    setTimeout(() => {
-                        setErrors('');
-                    }, 6000);
-                }
-            })
-
-        fileUploadRef.current.value = null;
     }
 
     const handleFileShare = () => {
@@ -230,10 +197,10 @@ export default function MyFiles() {
                 <Typography variant="h6" component="div" sx={{ py: 0.5, flexGrow: 1, }}>
                     My Files
                 </Typography>
-                <Button component="label" variant="contained" startIcon={<FileUploadIcon />}>
+                <Button onClick={handleUploadDialogOpen} variant="contained" startIcon={<FileUploadIcon />}>
                     Upload
-                    <VisuallyHiddenInput ref={fileUploadRef} type="file" onChange={handleFileUpload} />
                 </Button>
+                <FileUploadDialog isOpen={uploadDialogOpen} onClose={handleUploadDialogClose} />
             </Grid>
             {errors && <Alert severity="error" sx={{ alignItems: 'center', }}>
                 {errors}
@@ -244,7 +211,8 @@ export default function MyFiles() {
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ width: '80%', }}>Name</TableCell>
+                                <TableCell sx={{ width: '40%', }}>Name</TableCell>
+                                <TableCell sx={{ width: '40%', }}>Description</TableCell>
                                 <TableCell sx={{ width: '15%', }}>Last Modified</TableCell>
                                 <TableCell sx={{ width: '5%', }}></TableCell>
                             </TableRow>
@@ -253,6 +221,7 @@ export default function MyFiles() {
                             {files.map((file) => (
                                 <TableRow key={file.id}>
                                     <TableCell>{file.file_name}</TableCell>
+                                    <TableCell>{file.file_description}</TableCell>
                                     <TableCell>{file.updated_at}</TableCell>
                                     <TableCell>
                                         <IconButton aria-label="more" aria-controls="menu-list" aria-haspopup="true" onClick={(ev) => handleMoreIconOpen(ev, file.id)} size="small">

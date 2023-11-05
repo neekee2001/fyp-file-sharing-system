@@ -27,10 +27,13 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/users-to-share', [FileController::class, 'getUsersToShareFile']);
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::get('/shared-with-me', [FileController::class, 'showSharedWithMe']);
+    Route::get('/file/{id}', [FileController::class, 'getFileEditInfo']);
     Route::post('/file/upload', [FileController::class, 'store']);
     Route::post('/file/share', [FileController::class, 'share']);
     Route::get('/file/download-myfiles/{id}', [FileController::class, 'downloadFromMyFiles']);
     Route::get('/file/download-shared-with-me/{id}', [FileController::class, 'downloadFromSharedWithMe']);
+    Route::patch('/file/edit-myfiles/{id}', [FileController::class, 'editAtMyFiles']);
+    Route::patch('/file/edit-shared-with-me/{id}', [FileController::class, 'editAtSharedWithMe']);
     Route::delete('/file/delete/{id}', [FileController::class, 'destroy']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });

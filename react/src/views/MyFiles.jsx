@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import axiosClient from '../axios-client.js';
 import { useStateContext } from '../contexts/ContextProvider.jsx';
 import FileUploadDialog from '../components/FileUploadDialog.jsx';
+import FileEditDialog from '../components/FileEditDialog.jsx';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -30,9 +31,10 @@ export default function MyFiles() {
 
     const [errors, setErrors] = useState(null);
     const [files, setFiles] = useState([]);
-    const [selectedFileId, setSelectedFileId] = useState(0);
+    const [selectedFileId, setSelectedFileId] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogErrors, setDialogErrors] = useState(null);
     const [userOptions, setUserOptions] = useState([]);
@@ -50,7 +52,7 @@ export default function MyFiles() {
 
     const handleMoreIconClose = () => {
         setAnchorEl(null);
-        setSelectedFileId(0);
+        setSelectedFileId(null);
     }
 
     const handleUploadDialogOpen = () => {
@@ -59,6 +61,16 @@ export default function MyFiles() {
 
     const handleUploadDialogClose = () => {
         setUploadDialogOpen(false);
+        getFiles();
+    }
+
+    const handleEditDialogOpen = () => {
+        setEditDialogOpen(true);
+    }
+
+    const handleEditDialogClose = () => {
+        handleMoreIconClose();
+        setEditDialogOpen(false);
         getFiles();
     }
 
@@ -114,7 +126,6 @@ export default function MyFiles() {
             .then((response) => {
                 if (response && response.status == 201) {
                     handleShareDialogClose();
-                    handleMoreIconClose();
                     setNotification(response.data.message);
                 }
             })
@@ -200,7 +211,6 @@ export default function MyFiles() {
                 <Button onClick={handleUploadDialogOpen} variant="contained" startIcon={<FileUploadIcon />}>
                     Upload
                 </Button>
-                <FileUploadDialog isOpen={uploadDialogOpen} onClose={handleUploadDialogClose} />
             </Grid>
             {errors && <Alert severity="error" sx={{ alignItems: 'center', }}>
                 {errors}
@@ -237,7 +247,7 @@ export default function MyFiles() {
                                 onClose={handleMoreIconClose}
                                 >
                                 <MenuItem onClick={handleShareDialogOpen}>Share</MenuItem>
-                                <MenuItem>Edit</MenuItem>
+                                <MenuItem onClick={handleEditDialogOpen}>Edit</MenuItem>
                                 <MenuItem onClick={handleFileDownload}>Download</MenuItem>
                                 <MenuItem onClick={handleFileDelete}>Delete</MenuItem>
                             </Menu>
@@ -245,6 +255,8 @@ export default function MyFiles() {
                     </Table>
                 </TableContainer>
             </Paper>
+            <FileUploadDialog isOpen={uploadDialogOpen} onClose={handleUploadDialogClose} />
+            <FileEditDialog isOpen={editDialogOpen} onClose={handleEditDialogClose} fileId={selectedFileId} editMode="myFiles" />
             <Dialog open={dialogOpen} onClose={handleShareDialogClose} fullWidth maxWidth="sm">
                 <DialogTitle>
                     Share

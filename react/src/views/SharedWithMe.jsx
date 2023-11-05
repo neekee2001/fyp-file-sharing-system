@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axiosClient from '../axios-client.js';
 import { useStateContext } from '../contexts/ContextProvider.jsx';
+import FileEditDialog from '../components/FileEditDialog.jsx';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -19,9 +20,10 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 export default function SharedWithMe() {
     const [errors, setErrors] = useState(null);
     const [files, setFiles] = useState([]);
-    const [selectedFileId, setSelectedFileId] = useState(0);
+    const [selectedFileId, setSelectedFileId] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [showEdit, setShowEdit] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
     const {setNotification} = useStateContext();
 
     useEffect(() => {
@@ -36,7 +38,17 @@ export default function SharedWithMe() {
 
     const handleMoreIconClose = () => {
         setAnchorEl(null);
-        setSelectedFileId(0);
+        setSelectedFileId(null);
+    }
+
+    const handleEditDialogOpen = () => {
+        setEditDialogOpen(true);
+    }
+
+    const handleEditDialogClose = () => {
+        handleMoreIconClose();
+        setEditDialogOpen(false);
+        getSharedFiles();
     }
 
     const getSharedFiles = () => {
@@ -105,8 +117,9 @@ export default function SharedWithMe() {
                     <Table stickyHeader>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ width: '50%', }}>Name</TableCell>
-                                <TableCell sx={{ width: '30%', }}>Owner</TableCell>
+                                <TableCell sx={{ width: '25%', }}>Name</TableCell>
+                                <TableCell sx={{ width: '35%', }}>Description</TableCell>
+                                <TableCell sx={{ width: '20%', }}>Owner</TableCell>
                                 <TableCell sx={{ width: '15%', }}>Shared Date</TableCell>
                                 <TableCell sx={{ width: '5%', }}></TableCell>
                             </TableRow>
@@ -115,6 +128,7 @@ export default function SharedWithMe() {
                             {files.map((file) => (
                                 <TableRow key={file.file_id}>
                                     <TableCell>{file.file_name}</TableCell>
+                                    <TableCell>{file.file_description}</TableCell>
                                     <TableCell>{file.name}</TableCell>
                                     <TableCell>{file.created_at}</TableCell>
                                     <TableCell>
@@ -130,13 +144,14 @@ export default function SharedWithMe() {
                                 open={Boolean(anchorEl)}
                                 onClose={handleMoreIconClose}
                                 >
-                                {showEdit && <MenuItem>Edit</MenuItem>}
+                                {showEdit && <MenuItem onClick={handleEditDialogOpen}>Edit</MenuItem>}
                                 <MenuItem onClick={handleFileDownload}>Download</MenuItem>
                             </Menu>
                         </TableBody>
                     </Table>
                 </TableContainer>
             </Paper>
+            <FileEditDialog isOpen={editDialogOpen} onClose={handleEditDialogClose} fileId={selectedFileId} editMode="sharedWithMe" />
         </Grid>
     )
 }

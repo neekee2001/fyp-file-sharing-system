@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\EditFileRequest;
 use App\Http\Requests\ShareFileRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Models\File;
@@ -28,7 +29,7 @@ class FileController extends Controller
         $sharedFiles = SharedFile::join('permissions', 'permissions.id', '=', 'shared_files.shared_permission_id')
                         ->join('files', 'files.id', '=', 'shared_files.file_id')
                         ->join('users', 'users.id', '=', 'files.uploaded_by_user_id')
-                        ->select('shared_files.*', 'files.file_name', 'users.name', 'permissions.permission_name')
+                        ->select('shared_files.*', 'files.file_name', 'files.file_description', 'users.name', 'permissions.permission_name')
                         ->where('shared_files.shared_with_user_id', $userId)
                         ->orderByDesc('shared_files.created_at')
                         ->get();
@@ -152,12 +153,6 @@ class FileController extends Controller
         $fileMime = $fileRecord->file_mime;
         $hash = $fileRecord->ipfs_cid;
         $file = ipfs()->get($hash);
-
-        // if ($file === false) {
-        //     return response()->json([
-        //         'error' => 'File not found on IPFS'
-        //     ], 404);
-        // }
     
         return response($file)
             ->withHeaders([
@@ -170,25 +165,20 @@ class FileController extends Controller
     public function downloadFromSharedWithMe($id)
     {
         $userId = Auth::id();
-        $fileRecord = SharedFile::join('files', 'files.id', '=', 'shared_files.file_id')
-                        ->where('file_id', $id)->where('shared_with_user_id', $userId)->first();
+        $fileExist = File::join('shared_files', 'shared_files.file_id', '=', 'files.id')
+                        ->where('shared_files.file_id', $id)->where('shared_files.shared_with_user_id', $userId)->first();
 
-        if (!$fileRecord) {
+        if (!$fileExist) {
             return response()->json([
                 'message' => 'File not found.'
             ], 404);
         }
 
+        $fileRecord = File::where('id', $id)->first();
         $fileName = $fileRecord->file_name;
         $fileMime = $fileRecord->file_mime;
         $hash = $fileRecord->ipfs_cid;
         $file = ipfs()->get($hash);
-
-        // if ($file === false) {
-        //     return response()->json([
-        //         'error' => 'File not found on IPFS'
-        //     ], 404);
-        // }
     
         return response($file)
             ->withHeaders([
@@ -198,15 +188,88 @@ class FileController extends Controller
     }
 
     // Edit file metadata uploaded by user
-    public function editAtMyFiles(Request $request)
+    public function editAtMyFiles(EditFileRequest $request, $id)
     {
-        //
+        $userId = Auth::id();
+        $fileRecord = File::where('id', $id)->where('uploaded_by_user_id', $userId)->first();
+
+        if (!$fileRecord) {
+            return response()->json([
+                'message' => 'File not found.'
+            ], 404);
+        }
+
+        $data = $request->validated();
+        $existingFileExtension = pathinfo($fileRecord->file_name, PATHINFO_EXTENSION);
+        $newFileName = $data['file_name'].'.'.$existingFileExtension;
+        $newFileDescription = $data['file_description'];
+
+        if ($newFileName === $fileRecord->file_name && $newFileDescription === $fileRecord->file_description) {
+            return response()->json([
+                'message' => 'No changes made.'
+            ], 200);
+        }
+
+        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $userId)->where('file_name', $newFileName)->exists();
+
+        if ($checkExist == true) {
+            return response()->json([
+                'message' => 'A file with the same name already exists.'
+            ], 422);
+        }
+
+        $fileRecord->update([
+            'file_name' => $newFileName,
+            'file_description' => $newFileDescription
+        ]);
+
+        return response()->json([
+            'message' => 'File metadata edited successfully.'
+        ], 200);
     }
 
     // Edit file metadata shared to user
-    public function editAtSharedWithMe(Request $request)
+    public function editAtSharedWithMe(EditFileRequest $request, $id)
     {
-        //
+        $userId = Auth::id();
+        $fileExist = File::join('shared_files', 'shared_files.file_id', '=', 'files.id')
+                        ->where('shared_files.file_id', $id)->where('shared_files.shared_with_user_id', $userId)->first();
+
+        if (!$fileExist) {
+            return response()->json([
+                'message' => 'File not found.'
+            ], 404);
+        }
+
+        $fileRecord = File::where('id', $id)->first();
+        $data = $request->validated();
+        $existingFileExtension = pathinfo($fileRecord->file_name, PATHINFO_EXTENSION);
+        $newFileName = $data['file_name'].'.'.$existingFileExtension;
+        $newFileDescription = $data['file_description'];
+
+        if ($newFileName === $fileRecord->file_name && $newFileDescription === $fileRecord->file_description) {
+            return response()->json([
+                'message' => 'No changes made.'
+            ], 200);
+        }
+
+        $fileOwnerId = $fileRecord->uploaded_by_user_id;
+        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $fileOwnerId)->where('file_name', $newFileName)->exists();
+
+        if ($checkExist == true) {
+            return response()->json([
+                'message' => 'A file with the same name already exists at the owner side.'
+            ], 422);
+        }
+
+        $fileRecord->update([
+            'file_name' => $newFileName,
+            'file_description' => $newFileDescription
+        ]);
+
+        return response()->json([
+            'message' => 'File metadata edited successfully.'
+        ], 200);
     }
 
     // Delete file
@@ -234,5 +297,16 @@ class FileController extends Controller
         $userId = Auth::id();
         $users = User::where('id', '!=', $userId)->orderBy('email')->get();
         return response()->json($users);
+    }
+
+    public function getFileEditInfo($id)
+    {
+        $file = File::where('id', $id)->first();
+        $fileNameWithoutExtension = pathinfo($file->file_name, PATHINFO_FILENAME);
+
+        return response()->json([
+            'file_name' => $fileNameWithoutExtension,
+            'file_description' => $file->file_description
+        ]);
     }
 }

@@ -30,6 +30,16 @@ export default function SharedWithMe() {
         getSharedFiles();
     }, [])
 
+    const getSharedFiles = () => {
+        axiosClient.get('/shared-with-me')
+            .then(({data}) => {
+                setFiles(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching file data:', err);
+            })
+    }
+
     const handleMoreIconOpen = (ev, id, permission) => {
         setAnchorEl(ev.currentTarget);
         setSelectedFileId(id);
@@ -49,16 +59,6 @@ export default function SharedWithMe() {
         handleMoreIconClose();
         setEditDialogOpen(false);
         getSharedFiles();
-    }
-
-    const getSharedFiles = () => {
-        axiosClient.get('/shared-with-me')
-            .then(({data}) => {
-                setFiles(data);
-            })
-            .catch((err) => {
-                console.error('Error fetching file data:', err);
-            })
     }
 
     const handleFileDownload = () => {

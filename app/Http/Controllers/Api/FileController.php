@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EditFileRequest;
+use App\Http\Requests\RevokeFileAccessRequest;
 use App\Http\Requests\ShareFileRequest;
 use App\Http\Requests\StoreFileRequest;
+use App\Http\Requests\UpdateFileAccessRequest;
 use App\Models\File;
 use App\Models\SharedFile;
 use App\Models\User;
@@ -126,15 +128,40 @@ class FileController extends Controller
     }
 
     // Update user access to file
-    public function updateAccess(Request $request)
+    public function updateFileAccess(UpdateFileAccessRequest $request)
     {
-        //
+        $data = $request->validated();
+        $sharedFileId = $data['shared_file_id'];
+        $permissionId = $data['shared_permission_id'];
+        $sharedFileRecord = SharedFile::where('id', $sharedFileId)->first();
+
+        if ($permissionId == $sharedFileRecord->shared_permission_id) {
+            return response()->json([
+                'message' => 'No changes made.'
+            ], 200);
+        }
+
+        $sharedFileRecord->update([
+            'shared_permission_id' => $permissionId
+        ]);
+
+        return response()->json([
+            'message' => 'User access to file updated successfully.'
+        ], 200);
     }
 
     // Remove user access to file
-    public function revokeAccess(Request $request)
+    public function revokeFileAccess(RevokeFileAccessRequest $request)
     {
-        //
+        $data = $request->validated();
+        $sharedFileId = $data['shared_file_id'];
+        $sharedFileRecord = SharedFile::where('id', $sharedFileId)->first();
+
+        $sharedFileRecord->delete();
+
+        return response()->json([
+            'message' => 'File unshared with the user successfully.'
+        ], 200);
     }
 
     // Download file uploaded by user
@@ -297,6 +324,32 @@ class FileController extends Controller
         $userId = Auth::id();
         $users = User::where('id', '!=', $userId)->orderBy('email')->get();
         return response()->json($users);
+    }
+
+    public function getUsersWithViewerAccess($id)
+    {
+        $viewers = SharedFile::join('permissions', 'permissions.id', '=', 'shared_files.shared_permission_id')
+                        ->join('users', 'users.id', '=', 'shared_files.shared_with_user_id')
+                        ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name')
+                        ->where('shared_files.file_id', $id)
+                        ->where('permission_name', 'Viewer')
+                        ->orderBy('users.name')
+                        ->get();
+        
+        return response()->json($viewers);
+    }
+
+    public function getUsersWithEditorAccess($id)
+    {
+        $editors = SharedFile::join('permissions', 'permissions.id', '=', 'shared_files.shared_permission_id')
+                        ->join('users', 'users.id', '=', 'shared_files.shared_with_user_id')
+                        ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name')
+                        ->where('shared_files.file_id', $id)
+                        ->where('permission_name', 'Editor')
+                        ->orderBy('users.name')
+                        ->get();
+        
+        return response()->json($editors);
     }
 
     public function getFileEditInfo($id)

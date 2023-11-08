@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosClient from '../axios-client.js';
 import { useStateContext } from '../contexts/ContextProvider.jsx';
 import FileUploadDialog from '../components/FileUploadDialog.jsx';
+import FileShareDialog from '../components/FileShareDialog.jsx';
 import FileEditDialog from '../components/FileEditDialog.jsx';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -20,30 +17,33 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function MyFiles() {
-    const permissionIdRef = useRef();
-    const userIdRef = useRef();
-
     const [errors, setErrors] = useState(null);
     const [files, setFiles] = useState([]);
     const [selectedFileId, setSelectedFileId] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [shareDialogOpen, setShareDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [dialogErrors, setDialogErrors] = useState(null);
-    const [userOptions, setUserOptions] = useState([]);
-    const [permissionOptions, setPermissionOptions] = useState([]);
     const {setNotification} = useStateContext();
 
     useEffect(() => {
         getFiles();
     }, [])
+
+    const getFiles = () => {
+        axiosClient.get('/myfiles')
+            .then(({data}) => {
+                setFiles(data);
+            })
+            .catch((err) => {
+                console.error('Error fetching file data:', err);
+            })
+    }
 
     const handleMoreIconOpen = (ev, id) => {
         setAnchorEl(ev.currentTarget);
@@ -64,6 +64,15 @@ export default function MyFiles() {
         getFiles();
     }
 
+    const handleShareDialogOpen = () => {
+        setShareDialogOpen(true);
+    }
+
+    const handleShareDialogClose = () => {
+        handleMoreIconClose();
+        setShareDialogOpen(false);
+    }
+
     const handleEditDialogOpen = () => {
         setEditDialogOpen(true);
     }
@@ -72,72 +81,6 @@ export default function MyFiles() {
         handleMoreIconClose();
         setEditDialogOpen(false);
         getFiles();
-    }
-
-    const handleShareDialogOpen = () => {
-        getUsers();
-        getSharePermissions();
-        setDialogOpen(true);
-    }
-
-    const handleShareDialogClose = () => {
-        handleMoreIconClose();
-        setDialogOpen(false);
-    }
-
-    const getFiles = () => {
-        axiosClient.get('/myfiles')
-            .then(({data}) => {
-                setFiles(data);
-            })
-            .catch((err) => {
-                console.error('Error fetching file data:', err);
-            })
-    }
-
-    const getUsers = () => {
-        axiosClient.get('/users-to-share')
-            .then(({data}) => {
-                setUserOptions(data);
-            })
-            .catch((err) => {
-                console.error('Error fetching user data:', err);
-            })
-    }
-
-    const getSharePermissions = () => {
-        axiosClient.get('/permissions')
-            .then(({data}) => {
-                setPermissionOptions(data);
-            })
-            .catch((err) => {
-                console.error('Error fetching permission data:', err);
-            })
-    }
-
-    const handleFileShare = () => {
-        const payload = {
-            file_id: selectedFileId,
-            shared_with_user_id: userIdRef.current.value,
-            permission_id: permissionIdRef.current.value,
-        }
-
-        axiosClient.post('/file/share', payload)
-            .then((response) => {
-                if (response && response.status == 201) {
-                    handleShareDialogClose();
-                    setNotification(response.data.message);
-                }
-            })
-            .catch((err) => {
-                const response = err.response;
-                if (response && (response.status == 404 || response.status == 422)) {
-                    setDialogErrors(response.data.message);
-                    setTimeout(() => {
-                        setDialogErrors('');
-                    }, 6000);
-                }
-            })
     }
 
     const handleFileDownload = () => {
@@ -256,36 +199,8 @@ export default function MyFiles() {
                 </TableContainer>
             </Paper>
             <FileUploadDialog isOpen={uploadDialogOpen} onClose={handleUploadDialogClose} />
+            <FileShareDialog isOpen={shareDialogOpen} onClose={handleShareDialogClose} fileId={selectedFileId} />
             <FileEditDialog isOpen={editDialogOpen} onClose={handleEditDialogClose} fileId={selectedFileId} editMode="myFiles" />
-            <Dialog open={dialogOpen} onClose={handleShareDialogClose} fullWidth maxWidth="sm">
-                <DialogTitle>
-                    Share
-                </DialogTitle>
-                <DialogContent dividers>
-                    {dialogErrors && <Alert severity="error" sx={{ alignItems: 'center', }}>
-                        {dialogErrors}
-                    </Alert>
-                    }
-                    <TextField id="user_id" select label="Add user" defaultValue="" inputRef={userIdRef} variant="filled" margin="dense" fullWidth required>
-                        {userOptions.map((user) => (
-                            <MenuItem key={user.id} value={user.id}>
-                                {user.email}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                    <TextField id="permission_id" select label="Permission" defaultValue="" inputRef={permissionIdRef} variant="filled" margin="dense" fullWidth required>
-                        {permissionOptions.map((permission) => (
-                            <MenuItem key={permission.id} value={permission.id}>
-                                {permission.permission_name}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleShareDialogClose}>Cancel</Button>
-                    <Button onClick={handleFileShare}>Share</Button>
-                </DialogActions>
-            </Dialog>
         </Grid>
     )
 }

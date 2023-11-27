@@ -29,8 +29,12 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/users-with-editor-access/{id}', [FileController::class, 'getUsersWithEditorAccess']);
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::get('/shared-with-me', [FileController::class, 'showSharedWithMe']);
+    Route::get('/allfiles', [FileController::class, 'showAllFiles']);
+    Route::get('/share-requests', [FileController::class, 'showShareRequests']);
     Route::get('/file/{id}', [FileController::class, 'getFileEditInfo']);
     Route::post('/file/upload', [FileController::class, 'store']);
+    Route::post('/file/request-to-share', [FileController::class, 'requestToShare']);
+    Route::post('/file/approve-request', [FileController::class, 'approveRequest']);
     Route::post('/file/share', [FileController::class, 'share']);
     Route::post('/file/update-file-access', [FileController::class, 'updateFileAccess']);
     Route::post('/file/revoke-file-access', [FileController::class, 'revokeFileAccess']);

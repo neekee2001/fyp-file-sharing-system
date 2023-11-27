@@ -4,6 +4,8 @@ import Register from './views/Register.jsx';
 import NotFound from './views/NotFound.jsx';
 import MyFiles from './views/MyFiles.jsx';
 import SharedWithMe from './views/SharedWithMe.jsx';
+import AllFiles from './views/AllFiles.jsx';
+import ShareRequests from './views/ShareRequests.jsx';
 import Profile from './views/Profile.jsx';
 import DefaultLayout from './components/DefaultLayout.jsx';
 import GuestLayout from './components/GuestLayout.jsx';
@@ -24,6 +26,14 @@ const router = createBrowserRouter([
             {
                 path: '/sharedwithme',
                 element: <SharedWithMe />
+            },
+            {
+                path: '/allfiles',
+                element: <AllFiles />
+            },
+            {
+                path: '/sharerequests',
+                element: <ShareRequests />
             },
             {
                 path: '/profile',

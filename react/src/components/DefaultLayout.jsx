@@ -70,8 +70,14 @@ export default function DefaultLayout() {
                         <ListItemButton selected={selectedIndex === 1} onClick={(ev) => handleListItemClick(ev, 1)} component={Link} to="/sharedwithme">
                             <ListItemText primary="Shared With Me" sx={{ px: 1, }} />
                         </ListItemButton>
+                        <ListItemButton selected={selectedIndex === 2} onClick={(ev) => handleListItemClick(ev, 2)} component={Link} to="/allfiles">
+                            <ListItemText primary="All Files" sx={{ px: 1, }} />
+                        </ListItemButton>
+                        <ListItemButton selected={selectedIndex === 3} onClick={(ev) => handleListItemClick(ev, 3)} component={Link} to="/sharerequests">
+                            <ListItemText primary="Share Requests" sx={{ px: 1, }} />
+                        </ListItemButton>
                         <Divider />
-                        <ListItemButton selected={selectedIndex === 2} onClick={(ev) => handleListItemClick(ev, 2)} component={Link} to="/profile">
+                        <ListItemButton selected={selectedIndex === 4} onClick={(ev) => handleListItemClick(ev, 4)} component={Link} to="/profile">
                             <ListItemText primary="Profile" sx={{ px: 1, }} />
                         </ListItemButton>
                     </List>

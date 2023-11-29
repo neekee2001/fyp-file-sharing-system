@@ -1,6 +1,6 @@
 import { Link, Navigate, Outlet } from 'react-router-dom';
 import { useStateContext } from '../contexts/ContextProvider.jsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosClient from '../axios-client.js';
 import Logo from '../images/logo.png';
 import Alert from '@mui/material/Alert';
@@ -25,6 +25,29 @@ export default function DefaultLayout() {
     if (!token) {
         return <Navigate to="/login" />
     }
+
+    useEffect(() => {
+        const currentPath = window.location.pathname;
+        let selected;
+
+        if (currentPath === '/myfiles') {
+            selected = 0;
+        }
+        else if (currentPath === '/sharedwithme') {
+            selected = 1;
+        }
+        else if (currentPath === '/allfiles') {
+            selected = 2;
+        }
+        else if (currentPath === '/sharerequests') {
+            selected = 3;
+        }
+        else if (currentPath === '/profile') {
+            selected = 4;
+        }
+
+        setSelectedIndex(selected);
+    }, [window.location.pathname])
 
     const handleListItemClick = (ev, index) => {
         setSelectedIndex(index);

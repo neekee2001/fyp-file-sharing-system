@@ -20,12 +20,17 @@ export default function Register() {
     const passwordRef = useRef();
     const passwordConfirmationRef = useRef();
 
+    const [errors, setErrors] = useState(null);
     const [departmentOptions, setDepartmentOptions] = useState([]);
     const [roleOptions, setRoleOptions] = useState([]);
-    const [errors, setErrors] = useState(null);
     const {setUser, setToken} = useStateContext();
 
     useEffect(() => {
+        getDepartments();
+        getRoles();
+    }, [])
+
+    const getDepartments = () => {
         axiosClient.get('/departments')
             .then(({data}) => {
                 setDepartmentOptions(data);
@@ -33,7 +38,9 @@ export default function Register() {
             .catch((err) => {
                 console.error('Error fetching department data:', err);
             })
+    }
 
+    const getRoles = () => {
         axiosClient.get('/roles')
             .then(({data}) => {
                 setRoleOptions(data);
@@ -41,7 +48,7 @@ export default function Register() {
             .catch((err) => {
                 console.error('Error fetching role data:', err);
             })
-    }, [])
+    }
 
     const onSubmit = (ev) => {
         ev.preventDefault();

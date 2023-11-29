@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::patch('/file/edit-myfiles/{id}', [FileController::class, 'editAtMyFiles']);
     Route::patch('/file/edit-shared-with-me/{id}', [FileController::class, 'editAtSharedWithMe']);
     Route::delete('/file/delete/{id}', [FileController::class, 'destroy']);
+    Route::get('/profile', [ProfileController::class, 'showProfileInfo']);
+    Route::post('/profile/update', [ProfileController::class, 'updateProfileInfo']);
+    Route::post('/profile/update-password', [ProfileController::class, 'updatePassword']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 

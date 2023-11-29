@@ -87,16 +87,16 @@ export default function AllFiles() {
 
     return (
         <Grid>
-            <Grid sx={{ mb: 3, display: 'flex', }}>
+            <Grid sx={{ mb: 2, display: 'flex', }}>
                 <Typography variant="h6" component="div" sx={{ py: 0.5, flexGrow: 1, }}>
                     All Files
                 </Typography>
             </Grid>
-            {errors && <Alert severity="error" sx={{ alignItems: 'center', }}>
+            {errors && <Alert severity="error" sx={{ mb: 2, alignItems: 'center', }}>
                 {errors}
             </Alert>
             }
-            <Paper elevation={4} sx={{ my: 2, height: 450, }}>
+            <Paper elevation={4} sx={{ height: 450, }}>
                 <TableContainer sx={{ maxHeight: 450, }}>
                     <Table stickyHeader>
                         <TableHead>

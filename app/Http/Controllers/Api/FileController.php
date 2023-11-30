@@ -131,8 +131,10 @@ class FileController extends Controller
         $checkExist = SharedFile::where('file_id', $shareRequest->requested_file_id)->where('shared_with_user_id', $shareRequest->requested_by_user_id)->exists();
 
         if ($checkExist == true) {
+            $shareRequest->delete();
+
             return response()->json([
-                'message' => 'File shared with this user already.'
+                'message' => 'File shared with this user already. The request is deleted.'
             ], 422);
         }
 

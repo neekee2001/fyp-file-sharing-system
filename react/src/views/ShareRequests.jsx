@@ -51,6 +51,7 @@ export default function ShareRequests() {
                     setTimeout(() => {
                         setErrors('');
                     }, 6000);
+                    getShareRequests();
                 }
             })
     }

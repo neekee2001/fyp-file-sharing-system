@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\ExcludeCurrentUserRule;
+use App\Rules\ExcludeCurrentDepartmentRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShareFileRequest extends FormRequest
@@ -24,10 +24,10 @@ class ShareFileRequest extends FormRequest
     {
         return [
             'file_id' => 'required|exists:files,id',
-            'shared_with_user_id' => [
+            'shared_with_department_id' => [
                 'required',
-                'exists:users,id',
-                new ExcludeCurrentUserRule()
+                'exists:departments,id',
+                new ExcludeCurrentDepartmentRule()
             ],
             'permission_id' => 'required|exists:permissions,id'
         ];
@@ -36,7 +36,6 @@ class ShareFileRequest extends FormRequest
     public function messages()
     {
         return [
-            'shared_with_user_id.required' => 'Please select user to share.',
             'permission_id.required' => 'Please select share permission.',
         ];
     }

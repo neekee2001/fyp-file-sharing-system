@@ -32,6 +32,7 @@ class File extends Model
         'file_size',
         'file_mime',
         'ipfs_cid',
+        'aes_key',
         'uploaded_by_user_id',
     ];
 

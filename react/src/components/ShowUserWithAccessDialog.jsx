@@ -25,34 +25,10 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
 
     useEffect(() => {
         if (fileId) {
-            getDepartments();
-            getSharePermissions();
             getViewers();
             getEditors();
         }
     }, [fileId]);
-
-    const getDepartments = () => {
-        axiosClient
-            .get("/departments-to-share")
-            .then(({ data }) => {
-                setDeptOptions(data);
-            })
-            .catch((err) => {
-                console.error("Error fetching department data:", err);
-            });
-    };
-
-    const getSharePermissions = () => {
-        axiosClient
-            .get("/permissions")
-            .then(({ data }) => {
-                setPermissionOptions(data);
-            })
-            .catch((err) => {
-                console.error("Error fetching permission data:", err);
-            });
-    };
 
     const getViewers = () => {
         axiosClient

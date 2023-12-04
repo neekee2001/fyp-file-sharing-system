@@ -184,23 +184,33 @@ class FileController extends Controller
             ], 404);
         }
 
-        $checkExist = SharedFile::where('file_id', $fileId)->where('shared_with_department_id', $sharedWithDeptId)->exists();
+        // $checkExist = SharedFile::where('file_id', $fileId)->where('shared_with_department_id', $sharedWithDeptId)->exists();
 
-        if ($checkExist == true) {
-            return response()->json([
-                'message' => 'File shared with this department already.'
-            ], 422);
-        }
+        // if ($checkExist == true) {
+        //     return response()->json([
+        //         'message' => 'File shared with this department already.'
+        //     ], 422);
+        // }
 
         $sharedWithUserId = User::where('department_id', $sharedWithDeptId)->pluck('id')->toArray();
+        $usersWithAccess = SharedFile::where('file_id', $fileId)->pluck('shared_with_user_id')->toArray();
+        $usersWithoutAccess = array_diff($sharedWithUserId, $usersWithAccess);
 
-        foreach ($sharedWithUserId as $sharedUserId) {
-            SharedFile::create([
-                'file_id' => $fileId,
-                'shared_with_department_id' => $sharedWithDeptId,
-                'shared_with_user_id' => $sharedUserId,
-                'shared_permission_id' => $data['permission_id'],
-            ]);
+        if (empty($usersWithoutAccess)) {
+            return response()->json([
+                'message' => 'File shared with all users in this department.'
+            ], 404);
+        }
+
+        if (!empty($usersWithoutAccess)) {
+            foreach ($usersWithoutAccess as $sharedUserId) {
+                SharedFile::create([
+                    'file_id' => $fileId,
+                    'shared_with_department_id' => $sharedWithDeptId,
+                    'shared_with_user_id' => $sharedUserId,
+                    'shared_permission_id' => $data['permission_id'],
+                ]);
+            }
         }
 
         return response()->json([
@@ -426,7 +436,7 @@ class FileController extends Controller
     {
         $viewers = SharedFile::join('permissions', 'permissions.id', '=', 'shared_files.shared_permission_id')
             ->join('users', 'users.id', '=', 'shared_files.shared_with_user_id')
-            ->join('departments', 'departments.id', '=', 'users.department_id')
+            ->join('departments', 'departments.id', '=', 'shared_files.shared_with_department_id')
             ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name', 'departments.dep_name')
             ->where('shared_files.file_id', $id)
             ->where('permission_name', 'Viewer')
@@ -440,7 +450,7 @@ class FileController extends Controller
     {
         $editors = SharedFile::join('permissions', 'permissions.id', '=', 'shared_files.shared_permission_id')
             ->join('users', 'users.id', '=', 'shared_files.shared_with_user_id')
-            ->join('departments', 'departments.id', '=', 'users.department_id')
+            ->join('departments', 'departments.id', '=', 'shared_files.shared_with_department_id')
             ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name', 'departments.dep_name')
             ->where('shared_files.file_id', $id)
             ->where('permission_name', 'Editor')

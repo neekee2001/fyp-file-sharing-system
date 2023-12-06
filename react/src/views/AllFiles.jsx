@@ -88,6 +88,7 @@ export default function AllFiles() {
                     handleClose();
                     setNotification(response.data.message);
                     getAllFiles();
+                    getAllRequestedFiles();
                 }
             })
             .catch((err) => {

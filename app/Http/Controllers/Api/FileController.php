@@ -184,15 +184,7 @@ class FileController extends Controller
             ], 404);
         }
 
-        // $checkExist = SharedFile::where('file_id', $fileId)->where('shared_with_department_id', $sharedWithDeptId)->exists();
-
-        // if ($checkExist == true) {
-        //     return response()->json([
-        //         'message' => 'File shared with this department already.'
-        //     ], 422);
-        // }
-
-        $sharedWithUserId = User::where('department_id', $sharedWithDeptId)->pluck('id')->toArray();
+        $sharedWithUserId = User::where('department_id', $sharedWithDeptId)->where('id', '!=', $userId)->pluck('id')->toArray();
         $usersWithAccess = SharedFile::where('file_id', $fileId)->pluck('shared_with_user_id')->toArray();
         $usersWithoutAccess = array_diff($sharedWithUserId, $usersWithAccess);
 
@@ -419,11 +411,6 @@ class FileController extends Controller
         $departments = Department::all();
         return response()->json($departments);
     }
-
-    // public function getDeptWithViewerAccess(){
-    //     $viewers = SharedFile::join
-
-    // }
 
     public function getUsersToShareFile()
     {

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Rules\ExcludeCurrentDepartmentRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ShareFileRequest extends FormRequest
@@ -27,7 +26,6 @@ class ShareFileRequest extends FormRequest
             'shared_with_department_id' => [
                 'required',
                 'exists:departments,id',
-                new ExcludeCurrentDepartmentRule()
             ],
             'permission_id' => 'required|exists:permissions,id'
         ];

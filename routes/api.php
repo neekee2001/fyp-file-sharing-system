@@ -32,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::get('/shared-with-me', [FileController::class, 'showSharedWithMe']);
     Route::get('/allfiles', [FileController::class, 'showAllFiles']);
+    Route::get('/requested-file', [FileController::class, 'showRequestedFile']);
     Route::get('/share-requests', [FileController::class, 'showShareRequests']);
     Route::get('/file/{id}', [FileController::class, 'getFileEditInfo']);
     Route::post('/file/upload', [FileController::class, 'store']);

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -28,9 +28,11 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/users-to-share', [FileController::class, 'getUsersToShareFile']);
     Route::get('/users-with-viewer-access/{id}', [FileController::class, 'getUsersWithViewerAccess']);
     Route::get('/users-with-editor-access/{id}', [FileController::class, 'getUsersWithEditorAccess']);
+    Route::get('/departments-to-share', [FileController::class, 'getDeptToShare']);
     Route::get('/myfiles', [FileController::class, 'showMyFiles']);
     Route::get('/shared-with-me', [FileController::class, 'showSharedWithMe']);
     Route::get('/allfiles', [FileController::class, 'showAllFiles']);
+    Route::get('/requested-file', [FileController::class, 'showRequestedFile']);
     Route::get('/share-requests', [FileController::class, 'showShareRequests']);
     Route::get('/file/{id}', [FileController::class, 'getFileEditInfo']);
     Route::post('/file/upload', [FileController::class, 'store']);

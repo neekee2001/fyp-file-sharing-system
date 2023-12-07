@@ -15,6 +15,11 @@ class SharedFile extends Model
         return $this->belongsTo(File::class);
     }
 
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -27,6 +32,7 @@ class SharedFile extends Model
 
     protected $fillable = [
         'file_id',
+        'shared_with_department_id',
         'shared_with_user_id',
         'shared_permission_id',
     ];

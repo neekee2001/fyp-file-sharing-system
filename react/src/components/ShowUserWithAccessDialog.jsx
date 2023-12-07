@@ -27,6 +27,7 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
         if (fileId) {
             getViewers();
             getEditors();
+            getSharePermissions();
         }
     }, [fileId]);
 
@@ -49,6 +50,17 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
             })
             .catch((err) => {
                 console.error("Error fetching editors data:", err);
+            });
+    };
+
+    const getSharePermissions = () => {
+        axiosClient
+            .get("/permissions")
+            .then(({ data }) => {
+                setPermissionOptions(data);
+            })
+            .catch((err) => {
+                console.error("Error fetching permission data:", err);
             });
     };
 
@@ -159,6 +171,7 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
                                     <ListItemText primary={editor.dep_name} />
                                 </ListItem>
                             ) : null}
+
                             <ListItem disablePadding>
                                 <ListItemText
                                     secondary={`${editor.name} - ${editor.email}`}

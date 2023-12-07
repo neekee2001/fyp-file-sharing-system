@@ -185,6 +185,13 @@ class FileController extends Controller
         }
 
         $sharedWithUserId = User::where('department_id', $sharedWithDeptId)->where('id', '!=', $userId)->pluck('id')->toArray();
+
+        if (empty($sharedWithUserId)) {
+            return response()->json([
+                'message' => 'There are no users in this department.'
+            ], 404);
+        }
+
         $usersWithAccess = SharedFile::where('file_id', $fileId)->pluck('shared_with_user_id')->toArray();
         $usersWithoutAccess = array_diff($sharedWithUserId, $usersWithAccess);
 

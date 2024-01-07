@@ -51,6 +51,8 @@ class User extends Authenticatable
         'password',
         'department_id',
         'role_id',
+        'master_public_key',
+        'master_secret_key',
     ];
 
     /**

@@ -8,12 +8,23 @@ use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
         $credentials = $request->validated();
+
+        $goHost = env('GO_HOST');
+        $goPort = env('GO_PORT');
+
+        $url = "http://{$goHost}:{$goPort}/getKeys";
+        $goResponse = Http::get($url);
+
+        if ($goResponse->successful()) {
+            $keys = $goResponse->json();
+        }
 
         /** @var \App\Models\User $user */
         $user = User::create([
@@ -22,6 +33,8 @@ class AuthController extends Controller
             'password' => bcrypt($credentials['password']),
             'department_id' => $credentials['department_id'],
             'role_id' => $credentials['role_id'],
+            'master_public_key' => $keys['publicKey'],
+            'master_secret_key' => $keys['secretKey'],
         ]);
 
         $token = $user->createToken('main')->plainTextToken;
@@ -32,7 +45,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(LoginRequest $request) 
+    public function login(LoginRequest $request)
     {
         $credentials = $request->validated();
 
@@ -52,7 +65,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function logout(Request $request) 
+    public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json([], 204);

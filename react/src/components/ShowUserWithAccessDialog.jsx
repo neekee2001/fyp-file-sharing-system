@@ -14,7 +14,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
-export default function FileShareDialog({ isOpen, onClose, fileId }) {
+export default function ShowUserWithAccessDialog({ isOpen, onClose, fileId }) {
     const [errors, setErrors] = useState(null);
     const [permissionOptions, setPermissionOptions] = useState([]);
     const [viewers, setViewers] = useState([]);
@@ -22,13 +22,35 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
     const [selectedSharedFileId, setSelectedSharedFileId] = useState(null);
     const [updateAccessDialogOpen, setUpdateAccessDialogOpen] = useState(false);
     const { setNotification } = useStateContext();
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    // useEffect(() => {
+    //     if (fileId) {
+    //         getViewers();
+    //         getEditors();
+    //         getSharePermissions();
+    //     }
+    // }, [fileId]);
 
     useEffect(() => {
-        if (fileId) {
-            getViewers();
-            getEditors();
-            getSharePermissions();
-        }
+        const fetchData = async () => {
+            try {
+                console.log("Start fetchData");
+                if (fileId) {
+                    await getViewers();
+                    await getEditors();
+                    await getSharePermissions();
+                    setDataLoaded(true);
+                }
+                console.log("End fetchData");
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        console.log("Start useEffect");
+        fetchData();
+        console.log("End useEffect");
     }, [fileId]);
 
     const getViewers = () => {

@@ -80,14 +80,14 @@ class FileController extends Controller
     public function showRequestedFile()
     {
         $userId = Auth::id();
-        $shareRequests = ShareRequest::join('permissions', 'permissions.id', '=', 'share_requests.requested_permission_id')
+        $requestedFiles = ShareRequest::join('permissions', 'permissions.id', '=', 'share_requests.requested_permission_id')
             ->join('files', 'files.id', '=', 'share_requests.requested_file_id')
             ->join('users', 'users.id', '=', 'files.uploaded_by_user_id')
             ->select('share_requests.*', 'files.file_name', 'files.file_description', 'users.name', 'permissions.permission_name')
             ->where('share_requests.requested_by_user_id', $userId)
             ->orderByDesc('share_requests.created_at')
             ->get();
-        return response()->json($shareRequests);
+        return response()->json($requestedFiles);
     }
 
     // Upload file
@@ -157,7 +157,7 @@ class FileController extends Controller
             ], 404);
         }
 
-        $userDepartment = $requestedByUser->department;
+        $userDepartment = $requestedByUser->department_id;
 
         $checkExist = SharedFile::where('file_id', $shareRequest->requested_file_id)->where('shared_with_user_id', $shareRequest->requested_by_user_id)->exists();
 
@@ -281,6 +281,16 @@ class FileController extends Controller
             $fileRecord->update([
                 'ciphertext' => $goData,
             ]);
+
+            $shareRequestsToDelete = ShareRequest::whereIn('requested_by_user_id', $sharedWithUserId)
+                ->where('requested_file_id', $fileId)
+                ->get();
+
+            if ($shareRequestsToDelete->isNotEmpty()) {
+                foreach ($shareRequestsToDelete as $shareRequest) {
+                    $shareRequest->delete();
+                }
+            }
 
             return response()->json([
                 'message' => 'File shared successfully.'
@@ -568,6 +578,7 @@ class FileController extends Controller
             ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name', 'departments.dep_name')
             ->where('shared_files.file_id', $id)
             ->where('permission_name', 'Viewer')
+            ->orderBy('departments.dep_name')
             ->orderBy('users.name')
             ->get();
 
@@ -582,6 +593,7 @@ class FileController extends Controller
             ->select('shared_files.*', 'users.name', 'users.email', 'permissions.permission_name', 'departments.dep_name')
             ->where('shared_files.file_id', $id)
             ->where('permission_name', 'Editor')
+            ->orderBy('departments.dep_name')
             ->orderBy('users.name')
             ->get();
 

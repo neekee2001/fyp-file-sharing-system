@@ -214,12 +214,15 @@ export default function MyFiles() {
                                     <TableCell>{file.updated_at}</TableCell>
                                     <TableCell>
                                         <IconButton
-                                            onClick={(ev) =>
+                                            onClick={(ev) => {
+                                                console.log(
+                                                    "IconButton clicked"
+                                                );
                                                 handleShowUserWithAccessOpen(
                                                     ev,
                                                     file.id
-                                                )
-                                            }
+                                                );
+                                            }}
                                             size="small"
                                         >
                                             <VisibilityOutlinedIcon fontSize="inherit" />

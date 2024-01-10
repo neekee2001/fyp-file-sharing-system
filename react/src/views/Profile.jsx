@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axiosClient from "../axios-client.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
+import Loading from "../components/Loading.jsx";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
@@ -18,6 +19,7 @@ export default function Profile() {
 
     const [profileErrors, setProfileErrors] = useState(null);
     const [passwordErrors, setPasswordErrors] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [departmentOptions, setDepartmentOptions] = useState([]);
     const [roleOptions, setRoleOptions] = useState([]);
     const [name, setName] = useState("");
@@ -29,6 +31,7 @@ export default function Profile() {
         getDepartments();
         getRoles();
         getProfileInfo();
+        setIsLoading(true);
     }, []);
 
     const getDepartments = () => {
@@ -60,9 +63,11 @@ export default function Profile() {
                 setName(data.name);
                 setDepId(data.department_id);
                 setRoleId(data.role_id);
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.error("Error fetching profile info data:", err);
+                setIsLoading(false);
             });
     };
 
@@ -127,6 +132,10 @@ export default function Profile() {
                 }
             });
     };
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <Grid>

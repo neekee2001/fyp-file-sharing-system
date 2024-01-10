@@ -3,9 +3,6 @@ package main
 
 import (
 	"bytes"
-	// "testing"
-
-	// "crypto/cipher"
 	"encoding/base64"
 	"encoding/gob"
 	"encoding/json"
@@ -72,9 +69,9 @@ func processDecryption(data DecryptRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	bufPubKey := bytes.NewReader(pubKeyByte)
-	decPubKey := gob.NewDecoder(bufPubKey)
-	if err := decPubKey.Decode(&pubKey); err != nil {
+	buf := bytes.NewReader(pubKeyByte)
+	dec := gob.NewDecoder(buf)
+	if err := dec.Decode(&pubKey); err != nil {
 		return "", err
 	}
 
@@ -82,9 +79,9 @@ func processDecryption(data DecryptRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	bufSecKey := bytes.NewReader(secKeyByte)
-	decSecKey := gob.NewDecoder(bufSecKey)
-	if err := decSecKey.Decode(&secKey); err != nil {
+	buf = bytes.NewReader(secKeyByte)
+	dec = gob.NewDecoder(buf)
+	if err = dec.Decode(&secKey); err != nil {
 		return "", err
 	}
 
@@ -92,9 +89,9 @@ func processDecryption(data DecryptRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	bufCipher := bytes.NewReader(cipherByte)
-	decCipher := gob.NewDecoder(bufCipher)
-	if err := decCipher.Decode(&cipher); err != nil {
+	buf = bytes.NewReader(cipherByte)
+	dec = gob.NewDecoder(buf)
+	if err = dec.Decode(&cipher); err != nil {
 		return "", err
 	}
 
@@ -207,7 +204,7 @@ func generateMasterPublicSecretKey() ([]byte, []byte, error) {
 	}
 
 	encoder = gob.NewEncoder(&secretKeyBuffer)
-	if err := encoder.Encode(secretKey); err != nil {
+	if err = encoder.Encode(secretKey); err != nil {
 		return nil, nil, err
 	}
 	fmt.Println("-----Generating MPK & MSK------")
@@ -249,5 +246,4 @@ func main() {
 	http.HandleFunc("/decrypt", decryption)
 	http.HandleFunc("/getKeys", sendMasterPublicSecretKey)
 	http.ListenAndServe(":10000", nil)
-	// TestFAME(&testing.T{})
 }

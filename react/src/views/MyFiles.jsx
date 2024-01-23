@@ -5,6 +5,7 @@ import FileUploadDialog from "../components/FileUploadDialog.jsx";
 import FileShareDialog from "../components/FileShareDialog.jsx";
 import FileEditDialog from "../components/FileEditDialog.jsx";
 import ShowUserWithAccessDialog from "../components/ShowUserWithAccessDialog.jsx";
+import Loading from "../components/Loading.jsx";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
@@ -25,6 +26,7 @@ import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 
 export default function MyFiles() {
     const [errors, setErrors] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [files, setFiles] = useState([]);
     const [selectedFileId, setSelectedFileId] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -35,6 +37,7 @@ export default function MyFiles() {
     const { setNotification } = useStateContext();
 
     useEffect(() => {
+        setIsLoading(true);
         getFiles();
     }, []);
 
@@ -43,9 +46,11 @@ export default function MyFiles() {
             .get("/myfiles")
             .then(({ data }) => {
                 setFiles(data);
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.error("Error fetching file data:", err);
+                setIsLoading(false);
             });
     };
 
@@ -163,6 +168,10 @@ export default function MyFiles() {
             });
     };
 
+    if (isLoading) {
+        return <Loading />;
+    }
+
     return (
         <Grid>
             <Grid sx={{ mb: 2, display: "flex" }}>
@@ -214,12 +223,15 @@ export default function MyFiles() {
                                     <TableCell>{file.updated_at}</TableCell>
                                     <TableCell>
                                         <IconButton
-                                            onClick={(ev) =>
+                                            onClick={(ev) => {
+                                                console.log(
+                                                    "IconButton clicked"
+                                                );
                                                 handleShowUserWithAccessOpen(
                                                     ev,
                                                     file.id
-                                                )
-                                            }
+                                                );
+                                            }}
                                             size="small"
                                         >
                                             <VisibilityOutlinedIcon fontSize="inherit" />

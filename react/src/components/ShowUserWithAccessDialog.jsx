@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axiosClient from "../axios-client.js";
 import { useStateContext } from "../contexts/ContextProvider.jsx";
 import UpdateShareAccessDialog from "./UpdateShareAccessDialog.jsx";
+import Loading from "../components/Loading.jsx";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -14,22 +15,46 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 
-export default function FileShareDialog({ isOpen, onClose, fileId }) {
+export default function ShowUserWithAccessDialog({ isOpen, onClose, fileId }) {
     const [errors, setErrors] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [permissionOptions, setPermissionOptions] = useState([]);
     const [viewers, setViewers] = useState([]);
     const [editors, setEditors] = useState([]);
     const [selectedSharedFileId, setSelectedSharedFileId] = useState(null);
     const [updateAccessDialogOpen, setUpdateAccessDialogOpen] = useState(false);
     const { setNotification } = useStateContext();
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
-        if (fileId) {
+        if (isOpen && fileId) {
+            setIsLoading(true);
             getViewers();
             getEditors();
             getSharePermissions();
         }
-    }, [fileId]);
+    }, [isOpen, fileId]);
+
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             console.log("Start fetchData");
+    //             if (fileId) {
+    //                 await getViewers();
+    //                 await getEditors();
+    //                 await getSharePermissions();
+    //                 setDataLoaded(true);
+    //             }
+    //             console.log("End fetchData");
+    //         } catch (error) {
+    //             console.error("Error fetching data:", error);
+    //         }
+    //     };
+
+    //     console.log("Start useEffect");
+    //     fetchData();
+    //     console.log("End useEffect");
+    // }, [fileId]);
 
     const getViewers = () => {
         axiosClient
@@ -58,9 +83,11 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
             .get("/permissions")
             .then(({ data }) => {
                 setPermissionOptions(data);
+                setIsLoading(false);
             })
             .catch((err) => {
                 console.error("Error fetching permission data:", err);
+                setIsLoading(false);
             });
     };
 
@@ -103,6 +130,10 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
                 }
             });
     };
+
+    if (isLoading) {
+        return <Loading />;
+    }
 
     return (
         <Dialog

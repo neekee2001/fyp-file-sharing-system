@@ -23,8 +23,6 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
         if (fileId) {
             getDepartments();
             getSharePermissions();
-            getViewers();
-            getEditors();
         }
     }, [fileId]);
 
@@ -47,28 +45,6 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
             })
             .catch((err) => {
                 console.error("Error fetching permission data:", err);
-            });
-    };
-
-    const getViewers = () => {
-        axiosClient
-            .get("/users-with-viewer-access/" + fileId)
-            .then(({ data }) => {
-                setViewers(data);
-            })
-            .catch((err) => {
-                console.error("Error fetching viewers data:", err);
-            });
-    };
-
-    const getEditors = () => {
-        axiosClient
-            .get("/users-with-editor-access/" + fileId)
-            .then(({ data }) => {
-                setEditors(data);
-            })
-            .catch((err) => {
-                console.error("Error fetching editors data:", err);
             });
     };
 
@@ -98,7 +74,13 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
                     response &&
                     (response.status == 404 || response.status == 422)
                 ) {
-                    setErrors(response.data.message);
+                    if (response.data.errors) {
+                        setErrors(response.data.errors);
+                    } else {
+                        setErrors({
+                            user: [response.data.message],
+                        });
+                    }
                     setTimeout(() => {
                         setErrors("");
                     }, 6000);
@@ -118,7 +100,11 @@ export default function FileShareDialog({ isOpen, onClose, fileId }) {
             <DialogContent dividers>
                 {errors && (
                     <Alert severity="error" sx={{ alignItems: "center" }}>
-                        {errors}
+                        {Object.keys(errors).map((key) => (
+                            <p key={key} style={{ margin: "5px" }}>
+                                {errors[key][0]}
+                            </p>
+                        ))}
                     </Alert>
                 )}
                 <Grid sx={{ mb: 2 }}>

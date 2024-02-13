@@ -1,6 +1,7 @@
 ## About Project
 This project develops a web-based file-sharing platform using Laravel and React frameworks. This platform is built on top of the decentralized storage protocol, InterPlanetary File System (IPFS) to store the uploaded files. When files are uploaded, the contents will be encrypted using AES, and when files are shared, the AES key will be encrypted using the attribute-based encryption (ABE) method.
 
+
 ## Installation
 Set up the local environment by ensuring the following services have been installed.
 
@@ -29,6 +30,7 @@ Before using Laravel, make sure that your local machine has PHP and Composer ins
 1. Install [Node.js](https://nodejs.org/en).(Node.js comes with npm, so you don't need to install it separately.)
 2. Check that Node.js and npm are installed correctly with `node -v` and `npm -v` command.
 
+
 ## Laravel and React Project Setup
 To set up this project,
 1. Clone this project with `git clone` command.
@@ -46,6 +48,7 @@ Golang is used for attribute-based encryption (ABE).
 2. Start terminal/command prompt and navigate to the ABE folder with `cd ABE` command.
 3. Check that Go is installed correctly with `go version` command.
 4. Run `go get github.com/fentec-project/gofe/abe` to install the required library.
+
 
 ## Run Project
 To run this project, you should execute the following steps every time you open it.

@@ -11,7 +11,7 @@ MySQL Workbench is a graphical user interface tool used for developing, modifyin
 2. Launch MySQL Workbench and set up a new connection.
 
 ### IPFS
-IPFS (InterPlanetary File System) is a peer-to-peer distributed file system that allows for the secure and efficient storage and retrieval of files across a network of computers. 
+*IPFS (InterPlanetary File System) is a peer-to-peer distributed file system that allows for the secure and efficient storage and retrieval of files across a network of computers. 
 
 1. Install [IPFS Kubo](https://docs.ipfs.tech/install/command-line/#install-official-binary-distributions).
 2. Unzip the file to any file directory, such as C:/Program Files.

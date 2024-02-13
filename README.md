@@ -3,7 +3,7 @@ This project develops a web-based file-sharing platform using Laravel and React 
 
 
 ## Installation
-Set up the local environment by ensuring the following services have been installed.
+Build the local environment by ensuring the following services have been installed.
 
 ### MySQL Workbench 
 MySQL Workbench is a graphical user interface tool used for developing, modifying, and managing MySQL databases. It supports both MySQL and MariaDB databases and offers features such as database modeling, query design, data migration, and performance analysis.
@@ -40,7 +40,7 @@ To set up this project,
 5. Set the encryption key by executing `php artisan key:generate`.
 6. Run migration `php artisan migrate --seed`.
 7. Copy `react/.env.example` into `react/.env`. Adjust the VITE_API_BASE_URL parameter.
-8. Open a new terminal/command prompt and navigate to the react folder with `cd react` command. Run `npm install`.
+8. Start a new terminal/command prompt and navigate to the react folder with `cd react` command. Run `npm install`.
 
 ## Golang
 Golang is used for attribute-based encryption (ABE).

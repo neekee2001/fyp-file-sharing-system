@@ -159,7 +159,8 @@ class FileController extends Controller
 
         $userDepartment = $requestedByUser->department_id;
 
-        $checkExist = SharedFile::where('file_id', $shareRequest->requested_file_id)->where('shared_with_user_id', $shareRequest->requested_by_user_id)->exists();
+        $checkExist = SharedFile::where('file_id', $shareRequest->requested_file_id)
+            ->where('shared_with_user_id', $shareRequest->requested_by_user_id)->exists();
 
         if ($checkExist == true) {
             $shareRequest->delete();
@@ -216,7 +217,7 @@ class FileController extends Controller
 
     // Share file
     public function share(ShareFileRequest $request)
-    {   //aesKey, ownerPublicKey, departmentList
+    {
         $data = $request->validated();
         $fileId = $data['file_id'];
         $sharedWithDeptId = $data['shared_with_department_id'];
@@ -247,8 +248,6 @@ class FileController extends Controller
                 'message' => 'File shared with all users in this department.'
             ], 404);
         }
-
-
 
         $goHost = env('GO_HOST');
         $goPort = env('GO_PORT');
@@ -403,7 +402,8 @@ class FileController extends Controller
         $userId = Auth::id();
         // $user = User::find($userId);
         $fileExist = File::join('shared_files', 'shared_files.file_id', '=', 'files.id')
-            ->where('shared_files.file_id', $id)->where('shared_files.shared_with_user_id', $userId)->first();
+            ->where('shared_files.file_id', $id)
+            ->where('shared_files.shared_with_user_id', $userId)->first();
 
         if (!$fileExist) {
             return response()->json([
@@ -416,8 +416,6 @@ class FileController extends Controller
         $fileMime = $fileRecord->file_mime;
         $hash = $fileRecord->ipfs_cid;
         $encryptedFile = ipfs()->get($hash);
-        // $aesKey = Key::loadFromAsciiSafeString($fileRecord->aes_key);
-        // $file = Crypto::decrypt($encryptedFile, $aesKey);
 
         $goHost = env('GO_HOST');
         $goPort = env('GO_PORT');
@@ -431,11 +429,9 @@ class FileController extends Controller
             'secretKey' => $fileOwner->master_secret_key,
         ];
 
-        // return response()->json($goRequest);
         $goResponse = Http::post($url, $goRequest);
         if ($goResponse->successful()) {
             $goData = $goResponse->json();
-            // return response()->json($goData);
             $aesKey = Key::loadFromAsciiSafeString($goData['aes_key']);
             $file = Crypto::decrypt($encryptedFile, $aesKey);
 
@@ -474,7 +470,8 @@ class FileController extends Controller
             ], 200);
         }
 
-        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $userId)->where('file_name', $newFileName)->exists();
+        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $userId)
+            ->where('file_name', $newFileName)->exists();
 
         if ($checkExist == true) {
             return response()->json([
@@ -518,7 +515,8 @@ class FileController extends Controller
         }
 
         $fileOwnerId = $fileRecord->uploaded_by_user_id;
-        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $fileOwnerId)->where('file_name', $newFileName)->exists();
+        $checkExist = File::where('id', '!=', $id)->where('uploaded_by_user_id', $fileOwnerId)
+            ->where('file_name', $newFileName)->exists();
 
         if ($checkExist == true) {
             return response()->json([

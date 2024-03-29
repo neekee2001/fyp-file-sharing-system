@@ -8,13 +8,32 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
     public function showProfileInfo()
     {
+        // get start time in microseconds
+        $startTime = microtime(true);
+
         $userId = Auth::id();
         $user = User::where('id', $userId)->first();
+
+        // get end time in microseconds
+        $endTime = microtime(true);
+
+        // calculate the duration
+        $duration = $endTime - $startTime;
+
+        // convert duration to milliseconds for readability
+        $durationInMilliseconds = $duration * 1000;
+
+        // log start, end and duration times
+        Log::info('Start time: ' . $startTime);
+        Log::info('End time: ' . $endTime);
+        Log::info('Execution time: ' . $durationInMilliseconds . ' milliseconds');
+
 
         return response()->json([
             'name' => $user->name,
@@ -33,7 +52,7 @@ class ProfileController extends Controller
         $newDepartmentId = $data['department_id'];
         $newRoleId = $data['role_id'];
 
-        if ($newName === $user->name && $newDepartmentId == $user->department_id && $newRoleId == $user->role_id) {
+        if ($newName == $user->name && $newDepartmentId == $user->department_id && $newRoleId == $user->role_id) {
             return response()->json([
                 'message' => 'No changes made.'
             ], 200);

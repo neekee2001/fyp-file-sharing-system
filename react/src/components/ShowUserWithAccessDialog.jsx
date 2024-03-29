@@ -24,7 +24,6 @@ export default function ShowUserWithAccessDialog({ isOpen, onClose, fileId }) {
     const [selectedSharedFileId, setSelectedSharedFileId] = useState(null);
     const [updateAccessDialogOpen, setUpdateAccessDialogOpen] = useState(false);
     const { setNotification } = useStateContext();
-    const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
         if (isOpen && fileId) {
@@ -34,27 +33,6 @@ export default function ShowUserWithAccessDialog({ isOpen, onClose, fileId }) {
             getSharePermissions();
         }
     }, [isOpen, fileId]);
-
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             console.log("Start fetchData");
-    //             if (fileId) {
-    //                 await getViewers();
-    //                 await getEditors();
-    //                 await getSharePermissions();
-    //                 setDataLoaded(true);
-    //             }
-    //             console.log("End fetchData");
-    //         } catch (error) {
-    //             console.error("Error fetching data:", error);
-    //         }
-    //     };
-
-    //     console.log("Start useEffect");
-    //     fetchData();
-    //     console.log("End useEffect");
-    // }, [fileId]);
 
     const getViewers = () => {
         axiosClient
